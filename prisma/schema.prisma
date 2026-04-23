@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  color        String   @default("#01CFB5")
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("viewer")
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  embedUrl        String
+  thumbnail       String
+  category        String
+  specialtyColor  String
+  authMethod      String   @default("hub_token")
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  responsibleName String   @default("")
+  teamName        String   @default("")
+  createdAt       DateTime @default(now())
+}

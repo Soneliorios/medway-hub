@@ -1,0 +1,125 @@
+/**
+ * Medway Hub — Design Tokens
+ * Fonte oficial: Montserrat (Google Fonts)
+ * Versão: 1.0.0
+ *
+ * Como usar:
+ *   import 'medway-theme.css';
+ *   ou <link rel="stylesheet" href="/medway-theme.css">
+ */
+
+/* ─────────────────────────────────────────────
+   Google Font Import
+   ───────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  /* ── Tipografia ────────────────────────────── */
+  --mw-font: 'Montserrat', sans-serif;
+
+  /* ── Backgrounds ───────────────────────────── */
+  --mw-bg-base:     #08091A;   /* Fundo principal escuro com tom navy */
+  --mw-bg-surface:  #0D1024;   /* Cards e superfícies */
+  --mw-bg-elevated: #131629;   /* Modais, dropdowns */
+  --mw-bg-hover:    #1A1F35;   /* Hover states */
+
+  /* ── Brand Colors ──────────────────────────── */
+  --mw-navy:       #00205B;    /* Navy primary */
+  --mw-navy-80:    #334C7C;
+  --mw-navy-60:    #66799D;
+  --mw-navy-40:    #99A6BD;
+  --mw-teal:       #01CFB5;    /* Teal secondary */
+  --mw-teal-80:    #34D9C4;
+  --mw-teal-60:    #67E2D3;
+
+  /* ── Specialty Colors (categorias de projetos) */
+  --mw-clinic:     #407EC9;    /* Clínica Médica */
+  --mw-surgery:    #00EFC8;    /* Cirurgia */
+  --mw-go:         #AC145A;    /* Ginecologia & Obstetrícia */
+  --mw-pediatrics: #FFB81C;    /* Pediatria */
+  --mw-preventive: #3B3FB6;    /* Medicina Preventiva */
+
+  /* ── Text ──────────────────────────────────── */
+  --mw-text-primary:   #FFFFFF;
+  --mw-text-secondary: #99A6BD;
+  --mw-text-muted:     #66799D;
+
+  /* ── Borders ───────────────────────────────── */
+  --mw-border:         rgba(1, 207, 181, 0.12);
+  --mw-border-active:  #01CFB5;
+  --mw-border-hover:   rgba(1, 207, 181, 0.40);
+
+  /* ── Shadows ───────────────────────────────── */
+  --mw-shadow-card:  0 4px 24px rgba(0, 32, 91, 0.4);
+  --mw-shadow-hover: 0 8px 40px rgba(1, 207, 181, 0.15);
+  --mw-glow-teal:    0 0 24px rgba(1, 207, 181, 0.2);
+
+  /* ── Border Radius ─────────────────────────── */
+  --mw-radius-sm: 8px;    /* cards */
+  --mw-radius-md: 12px;   /* modais */
+  --mw-radius-lg: 16px;   /* badges */
+
+  /* ── Glassmorphism ─────────────────────────── */
+  --mw-glass-bg:     rgba(13, 16, 36, 0.72);
+  --mw-glass-border: rgba(255, 255, 255, 0.06);
+  --mw-blur:         blur(16px);
+  --mw-blur-sm:      blur(8px);
+}
+
+/* ─────────────────────────────────────────────
+   Base Styles
+   ───────────────────────────────────────────── */
+[data-medway] {
+  font-family: var(--mw-font);
+  background-color: var(--mw-bg-base);
+  color: var(--mw-text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Utility Classes
+   ───────────────────────────────────────────── */
+
+/* Specialty badge backgrounds (semitransparente) */
+.mw-badge-clinic     { background: rgba(64,  126, 201, 0.18); color: #407EC9; }
+.mw-badge-surgery    { background: rgba(0,   239, 200, 0.12); color: #00EFC8; }
+.mw-badge-go         { background: rgba(172,  20,  90, 0.18); color: #AC145A; }
+.mw-badge-pediatrics { background: rgba(255, 184,  28, 0.15); color: #FFB81C; }
+.mw-badge-preventive { background: rgba(59,   63, 182, 0.18); color: #3B3FB6; }
+
+/* Glass card */
+.mw-glass {
+  background: var(--mw-glass-bg);
+  border: 1px solid var(--mw-glass-border);
+  backdrop-filter: var(--mw-blur);
+  -webkit-backdrop-filter: var(--mw-blur);
+}
+
+/* Glow button */
+.mw-btn-primary {
+  background-color: var(--mw-teal);
+  color: var(--mw-navy);
+  font-family: var(--mw-font);
+  font-weight: 600;
+  border-radius: var(--mw-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.mw-btn-primary:hover {
+  box-shadow: var(--mw-glow-teal);
+  transform: translateY(-1px);
+}
+
+.mw-btn-secondary {
+  background-color: transparent;
+  color: var(--mw-teal);
+  font-family: var(--mw-font);
+  font-weight: 600;
+  border-radius: var(--mw-radius-sm);
+  border: 1.5px solid var(--mw-teal);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.mw-btn-secondary:hover {
+  background-color: rgba(1, 207, 181, 0.08);
+}
