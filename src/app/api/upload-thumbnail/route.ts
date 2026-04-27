@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { put } from "@vercel/blob";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
@@ -40,12 +41,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Use Vercel Blob in production, local filesystem in development
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(file.name, file, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+    return NextResponse.json({ url: blob.url });
+  }
+
+  // Fallback: local filesystem (dev only)
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const filename = `${randomUUID()}.${ext}`;
   const uploadDir = join(process.cwd(), "public", "uploads");
-
   await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
-
   return NextResponse.json({ url: `/uploads/${filename}` });
 }
