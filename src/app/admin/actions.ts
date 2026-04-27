@@ -85,24 +85,50 @@ export async function toggleProjectStatus(id: string, isActive: boolean) {
 export async function createUser(formData: FormData) {
   await requireAdmin();
 
-  const password = formData.get("password") as string;
-  if (!password || password.length < 6) {
-    throw new Error("Senha deve ter pelo menos 6 caracteres");
+  const email = (formData.get("email") as string).toLowerCase().trim();
+  const name = formData.get("name") as string;
+  const role = (formData.get("role") as string) || "viewer";
+
+  if (!email.endsWith("@medway.com.br")) {
+    throw new Error("O e-mail deve ser @medway.com.br");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 12);
+  const { generateTempPassword, sendWelcomeEmail } = await import("@/lib/email");
+  const tempPassword = generateTempPassword();
+  const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
   await prisma.user.create({
-    data: {
-      name: formData.get("name") as string,
-      email: (formData.get("email") as string).toLowerCase().trim(),
-      password: hashedPassword,
-      role: (formData.get("role") as string) || "viewer",
-    },
+    data: { name, email, password: hashedPassword, role, mustChangePassword: true },
   });
+
+  const hubUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  await sendWelcomeEmail({ name, email, tempPassword, hubUrl });
 
   revalidatePath("/admin/users");
   redirect("/admin/users");
+}
+
+export async function changePassword(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+
+  const newPassword = formData.get("newPassword") as string;
+  const confirm = formData.get("confirm") as string;
+
+  if (!newPassword || newPassword.length < 8) {
+    throw new Error("A senha deve ter pelo menos 8 caracteres");
+  }
+  if (newPassword !== confirm) {
+    throw new Error("As senhas não conferem");
+  }
+
+  const hashed = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({
+    where: { id: (session.user as any).id },
+    data: { password: hashed, mustChangePassword: false },
+  });
+
+  redirect("/");
 }
 
 export async function updateUser(id: string, formData: FormData) {

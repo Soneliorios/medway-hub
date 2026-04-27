@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { createUser, updateUser } from "@/app/admin/actions";
 import Link from "next/link";
+import { Mail } from "lucide-react";
 
 interface User {
   id: string;
@@ -37,8 +38,8 @@ const labelStyle = {
 
 export function UserForm({ user }: UserFormProps) {
   const [isPending, startTransition] = useTransition();
-
   const action = user ? updateUser.bind(null, user.id) : createUser;
+  const isNew = !user;
 
   return (
     <form
@@ -58,29 +59,42 @@ export function UserForm({ user }: UserFormProps) {
 
       <div>
         <label style={labelStyle}>E-mail</label>
-        <input
-          name="email"
-          type="email"
-          required
-          defaultValue={user?.email}
-          style={inputStyle}
-          placeholder="email@medway.com.br"
-        />
+        <div className="relative">
+          <input
+            name="email"
+            type="email"
+            required
+            defaultValue={user?.email}
+            style={{ ...inputStyle, paddingLeft: 38 }}
+            placeholder="nome@medway.com.br"
+            pattern=".*@medway\.com\.br$"
+            title="Use um e-mail @medway.com.br"
+          />
+          <Mail
+            size={15}
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: "var(--mw-text-muted)" }}
+          />
+        </div>
+        {isNew && (
+          <p className="text-xs mt-1.5" style={{ color: "var(--mw-text-muted)" }}>
+            Apenas e-mails @medway.com.br são aceitos.
+          </p>
+        )}
       </div>
 
-      <div>
-        <label style={labelStyle}>
-          Senha{user ? " (deixe em branco para não alterar)" : ""}
-        </label>
-        <input
-          name="password"
-          type="password"
-          required={!user}
-          style={inputStyle}
-          placeholder={user ? "••••••••" : "Mínimo 6 caracteres"}
-          minLength={user ? undefined : 6}
-        />
-      </div>
+      {/* Edição: permite trocar senha manualmente */}
+      {!isNew && (
+        <div>
+          <label style={labelStyle}>Nova senha (deixe em branco para não alterar)</label>
+          <input
+            name="password"
+            type="password"
+            style={inputStyle}
+            placeholder="••••••••"
+          />
+        </div>
+      )}
 
       <div>
         <label style={labelStyle}>Perfil</label>
@@ -95,6 +109,22 @@ export function UserForm({ user }: UserFormProps) {
         </select>
       </div>
 
+      {/* Invite notice */}
+      {isNew && (
+        <div
+          className="flex items-start gap-3 rounded-mw p-4 text-sm"
+          style={{
+            background: "rgba(1,207,181,0.08)",
+            border: "1px solid rgba(1,207,181,0.2)",
+          }}
+        >
+          <Mail size={16} style={{ color: "var(--mw-teal)", flexShrink: 0, marginTop: 2 }} />
+          <p style={{ color: "var(--mw-text-secondary)" }}>
+            Um e-mail com senha temporária será enviado automaticamente. O usuário deverá criar uma senha pessoal no primeiro acesso.
+          </p>
+        </div>
+      )}
+
       <div className="flex gap-3 pt-2">
         <button
           type="submit"
@@ -106,15 +136,14 @@ export function UserForm({ user }: UserFormProps) {
             fontFamily: "var(--mw-font)",
           }}
         >
-          {isPending ? "Salvando…" : user ? "Salvar Alterações" : "Criar Usuário"}
+          {isPending
+            ? isNew ? "Enviando convite…" : "Salvando…"
+            : isNew ? "Enviar convite" : "Salvar Alterações"}
         </button>
         <Link
           href="/admin/users"
           className="px-6 py-2.5 rounded-mw text-sm font-semibold"
-          style={{
-            border: "1px solid var(--mw-border)",
-            color: "var(--mw-text-secondary)",
-          }}
+          style={{ border: "1px solid var(--mw-border)", color: "var(--mw-text-secondary)" }}
         >
           Cancelar
         </Link>
