@@ -1,6 +1,14 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function createTransporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+}
 
 export async function sendWelcomeEmail({
   name,
@@ -13,10 +21,12 @@ export async function sendWelcomeEmail({
   tempPassword: string;
   hubUrl: string;
 }) {
-  await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? "Medway Hub <noreply@medway.com.br>",
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: `"Medway Hub" <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: "Seu acesso ao Medway Hub",
+    subject: "Seu acesso ao Medway Hub MKT",
     html: `
 <!DOCTYPE html>
 <html>
@@ -25,14 +35,14 @@ export async function sendWelcomeEmail({
   <div style="max-width:520px;margin:40px auto;background:#0D1024;border-radius:12px;border:1px solid #1e2340;overflow:hidden;">
 
     <div style="background:#00205B;padding:32px;text-align:center;">
-      <h1 style="color:#01CFB5;margin:0;font-size:24px;font-weight:900;letter-spacing:-0.5px;">Medway Hub</h1>
+      <h1 style="color:#01CFB5;margin:0;font-size:24px;font-weight:900;letter-spacing:-0.5px;">Medway Hub MKT</h1>
       <p style="color:#7a8bbd;margin:8px 0 0;font-size:13px;">Catálogo de projetos internos</p>
     </div>
 
     <div style="padding:32px;">
       <p style="color:#e2e8f0;font-size:15px;margin:0 0 24px;">Olá, <strong>${name}</strong>!</p>
       <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        Seu acesso ao <strong style="color:#01CFB5;">Medway Hub</strong> foi criado. Use as credenciais abaixo para entrar pela primeira vez.
+        Seu acesso ao <strong style="color:#01CFB5;">Medway Hub MKT</strong> foi criado. Use as credenciais abaixo para entrar pela primeira vez.
       </p>
 
       <div style="background:#131629;border:1px solid #1e2340;border-radius:8px;padding:20px;margin:0 0 24px;">
@@ -47,7 +57,7 @@ export async function sendWelcomeEmail({
       </p>
 
       <a href="${hubUrl}/login" style="display:block;text-align:center;background:#01CFB5;color:#00205B;font-weight:900;font-size:15px;padding:14px;border-radius:8px;text-decoration:none;">
-        Acessar o Medway Hub →
+        Acessar o Medway Hub MKT →
       </a>
     </div>
 
@@ -71,7 +81,6 @@ export function generateTempPassword(): string {
 
   const pick = (s: string) => s[Math.floor(Math.random() * s.length)];
 
-  // Garante ao menos 1 de cada categoria
   const chars = [
     pick(upper), pick(upper),
     pick(lower), pick(lower), pick(lower),
@@ -79,7 +88,6 @@ export function generateTempPassword(): string {
     pick(special),
   ];
 
-  // Embaralha
   for (let i = chars.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [chars[i], chars[j]] = [chars[j], chars[i]];
