@@ -132,8 +132,7 @@ export async function changePassword(formData: FormData) {
     where: { id: (session.user as any).id },
     data: { password: hashed, mustChangePassword: false },
   });
-
-  redirect("/");
+  // Client will call update() to refresh the JWT, then navigate to /
 }
 
 export async function updateUser(id: string, formData: FormData) {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -141,7 +142,12 @@ export function LoginForm() {
           boxShadow: loading ? "none" : "var(--mw-glow-teal)",
         }}
       >
-        {loading ? "Entrando…" : "Entrar"}
+        {loading ? (
+        <span className="flex items-center justify-center gap-2">
+          <Loader2 size={16} className="animate-spin" />
+          Entrando…
+        </span>
+      ) : "Entrar"}
       </button>
     </form>
   );

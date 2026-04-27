@@ -3,12 +3,16 @@
 import { useTransition, useState } from "react";
 import { changePassword } from "@/app/admin/actions";
 import { Eye, EyeOff } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function ChangePasswordPage() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const { update } = useSession();
+  const router = useRouter();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,9 +21,11 @@ export default function ChangePasswordPage() {
     startTransition(async () => {
       try {
         await changePassword(fd);
+        // Update the JWT so mustChangePassword becomes false
+        await update({ mustChangePassword: false });
+        router.push("/");
+        router.refresh();
       } catch (err: any) {
-        // Re-throw Next.js redirect — it must propagate to the framework
-        if (err?.digest?.startsWith("NEXT_REDIRECT")) throw err;
         setError(err.message ?? "Erro ao alterar senha.");
       }
     });
