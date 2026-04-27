@@ -102,15 +102,26 @@ export async function createUser(formData: FormData) {
   });
 
   // Email is best-effort — user is created even if send fails
+  let emailSent = false;
   try {
     const hubUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
     await sendWelcomeEmail({ name, email, tempPassword, hubUrl });
+    emailSent = true;
   } catch (err) {
     console.error("Failed to send welcome email:", err);
   }
 
   revalidatePath("/admin/users");
-  redirect("/admin/users");
+
+  // Pass temp password via URL so admin can share manually if email failed
+  const params = new URLSearchParams({
+    invited: "1",
+    n: name,
+    e: email,
+    pw: tempPassword,
+    sent: emailSent ? "1" : "0",
+  });
+  redirect(`/admin/users?${params.toString()}`);
 }
 
 export async function changePassword(formData: FormData) {
