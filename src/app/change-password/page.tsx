@@ -2,10 +2,13 @@
 
 import { useTransition, useState } from "react";
 import { changePassword } from "@/app/admin/actions";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ChangePasswordPage() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,22 +18,58 @@ export default function ChangePasswordPage() {
       try {
         await changePassword(fd);
       } catch (err: any) {
+        // Re-throw Next.js redirect — it must propagate to the framework
+        if (err?.digest?.startsWith("NEXT_REDIRECT")) throw err;
         setError(err.message ?? "Erro ao alterar senha.");
       }
     });
   }
 
-  const inputStyle = {
+  const inputStyle: React.CSSProperties = {
     background: "var(--mw-bg-elevated)",
     border: "1px solid var(--mw-border)",
     color: "var(--mw-text-primary)",
     fontFamily: "var(--mw-font)",
     borderRadius: "var(--mw-radius-sm)",
-    padding: "12px 14px",
+    padding: "12px 42px 12px 14px",
     width: "100%",
     fontSize: "15px",
     outline: "none",
   };
+
+  function PasswordField({
+    name,
+    placeholder,
+    show,
+    onToggle,
+  }: {
+    name: string;
+    placeholder: string;
+    show: boolean;
+    onToggle: () => void;
+  }) {
+    return (
+      <div className="relative">
+        <input
+          name={name}
+          type={show ? "text" : "password"}
+          required
+          minLength={8}
+          style={inputStyle}
+          placeholder={placeholder}
+        />
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2"
+          style={{ color: "var(--mw-text-muted)" }}
+          tabIndex={-1}
+        >
+          {show ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -70,13 +109,11 @@ export default function ChangePasswordPage() {
             >
               Nova senha
             </label>
-            <input
+            <PasswordField
               name="newPassword"
-              type="password"
-              required
-              minLength={8}
-              style={inputStyle}
               placeholder="Mínimo 8 caracteres"
+              show={showNew}
+              onToggle={() => setShowNew((v) => !v)}
             />
           </div>
 
@@ -87,12 +124,11 @@ export default function ChangePasswordPage() {
             >
               Confirmar senha
             </label>
-            <input
+            <PasswordField
               name="confirm"
-              type="password"
-              required
-              style={inputStyle}
               placeholder="Repita a senha"
+              show={showConfirm}
+              onToggle={() => setShowConfirm((v) => !v)}
             />
           </div>
 
