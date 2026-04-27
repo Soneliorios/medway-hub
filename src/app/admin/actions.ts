@@ -101,8 +101,13 @@ export async function createUser(formData: FormData) {
     data: { name, email, password: hashedPassword, role, mustChangePassword: true },
   });
 
-  const hubUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-  await sendWelcomeEmail({ name, email, tempPassword, hubUrl });
+  // Email is best-effort — user is created even if send fails
+  try {
+    const hubUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    await sendWelcomeEmail({ name, email, tempPassword, hubUrl });
+  } catch (err) {
+    console.error("Failed to send welcome email:", err);
+  }
 
   revalidatePath("/admin/users");
   redirect("/admin/users");
