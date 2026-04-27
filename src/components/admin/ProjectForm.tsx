@@ -90,15 +90,16 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
 
     try {
       const res = await fetch("/api/upload-thumbnail", { method: "POST", body: fd });
-      const data = await res.json();
+      let data: any = {};
+      try { data = await res.json(); } catch { /* non-JSON response */ }
       if (!res.ok) {
-        setUploadError(data.error ?? "Falha no upload.");
+        setUploadError(data.error ?? `Erro ${res.status} no upload.`);
       } else {
         setThumbnailUrl(data.url);
         setImgLoading(true);
       }
-    } catch {
-      setUploadError("Erro de rede ao fazer upload.");
+    } catch (err: any) {
+      setUploadError(err?.message ?? "Erro de rede ao fazer upload.");
     } finally {
       setUploading(false);
     }
