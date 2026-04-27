@@ -12,7 +12,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Medway Hub",
+  title: "Medway Hub MKT",
   description: "Plataforma centralizada de projetos Medway",
   icons: {
     icon: "/icon.png",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     apple: "/icon.png",
   },
   openGraph: {
-    title: "Medway Hub",
+    title: "Medway Hub MKT",
     description: "Plataforma centralizada de projetos Medway",
     images: [{ url: "/icon.png" }],
   },
