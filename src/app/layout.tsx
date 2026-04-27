@@ -14,6 +14,16 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Medway Hub",
   description: "Plataforma centralizada de projetos Medway",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
+  openGraph: {
+    title: "Medway Hub",
+    description: "Plataforma centralizada de projetos Medway",
+    images: [{ url: "/icon.png" }],
+  },
 };
 
 export default function RootLayout({
